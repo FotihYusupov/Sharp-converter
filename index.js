@@ -38,11 +38,11 @@ const uploadFile = (req, res, next) => {
           fs.writeFileSync(`${outputPath}${filename}`, convertedImageBuffer);
           image.large = `${process.env.URL}${filename}`
           const medium = `${Date.now()}_${i}.jpeg`;
-          convertedImageBuffer = await sharp(req.files[i].path).resize(650, 400, { fit: sharp.fit.inside, withoutEnlargement: true }).jpeg({ lossless: true, quality: 100}).toBuffer()
+          convertedImageBuffer = await sharp(req.files[i].path).resize(900, 800, { fit: sharp.fit.inside, withoutEnlargement: true }).jpeg({ lossless: true, quality: 100}).toBuffer()
           fs.writeFileSync(`${outputPath}${medium}`, convertedImageBuffer);
           image.medium = `${process.env.URL}${medium}`
           const small = `${Date.now()}_${i}.jpeg`;
-          convertedImageBuffer = await sharp(req.files[i].path).resize(400, 300, { fit: sharp.fit.inside, withoutEnlargement: true }).jpeg({ lossless: true, quality: 100}).toBuffer()
+          convertedImageBuffer = await sharp(req.files[i].path).resize(600, 500, { fit: sharp.fit.inside, withoutEnlargement: true }).jpeg({ lossless: true, quality: 100}).toBuffer()
           fs.writeFileSync(`${outputPath}${small}`, convertedImageBuffer);
           image.small = `${process.env.URL}${small}`
           files.push(image)
@@ -57,11 +57,11 @@ const uploadFile = (req, res, next) => {
           fs.writeFileSync(`${outputPath}${filename}`, convertedImageBuffer);
           image.large = `${process.env.URL}${filename}`
           const medium = `${Date.now()}_${i}.png`;
-          convertedImageBuffer = await sharp(req.files[i].path).resize(650, 400, { fit: sharp.fit.inside, withoutEnlargement: true }).png({ lossless: true, quality: 100}).toBuffer()
+          convertedImageBuffer = await sharp(req.files[i].path).resize(900, 800, { fit: sharp.fit.inside, withoutEnlargement: true }).png({ lossless: true, quality: 100}).toBuffer()
           fs.writeFileSync(`${outputPath}${medium}`, convertedImageBuffer);
           image.medium = `${process.env.URL}${medium}`
           const small = `${Date.now()}_${i}.png`;
-          convertedImageBuffer = await sharp(req.files[i].path).resize(200, 300, { fit: sharp.fit.inside, withoutEnlargement: true }).png({ lossless: true, quality: 100}).toBuffer()
+          convertedImageBuffer = await sharp(req.files[i].path).resize(600, 500, { fit: sharp.fit.inside, withoutEnlargement: true }).png({ lossless: true, quality: 100}).toBuffer()
           fs.writeFileSync(`${outputPath}${small}`, convertedImageBuffer);
           image.small = `${process.env.URL}${small}`
           files.push(image)
@@ -76,11 +76,11 @@ const uploadFile = (req, res, next) => {
           fs.writeFileSync(`${outputPath}${filename}`, convertedImageBuffer);
           image.large = `${process.env.URL}${filename}`
           const medium = `${Date.now()}_${i}.webp`;
-          convertedImageBuffer = await sharp(req.files[i].path).resize(650, 400, { fit: sharp.fit.inside, withoutEnlargement: true }).webp({ lossless: true, quality: 100}).toBuffer()
+          convertedImageBuffer = await sharp(req.files[i].path).resize(900, 800, { fit: sharp.fit.inside, withoutEnlargement: true }).webp({ lossless: true, quality: 100}).toBuffer()
           fs.writeFileSync(`${outputPath}${medium}`, convertedImageBuffer);
           image.medium = `${process.env.URL}${medium}`
           const small = `${Date.now()}_${i}.webp`;
-          convertedImageBuffer = await sharp(req.files[i].path).resize(300, 200, { fit: sharp.fit.inside, withoutEnlargement: true }).webp({ lossless: true, quality: 100}).toBuffer()
+          convertedImageBuffer = await sharp(req.files[i].path).resize(600, 500, { fit: sharp.fit.inside, withoutEnlargement: true }).webp({ lossless: true, quality: 100}).toBuffer()
           fs.writeFileSync(`${outputPath}${small}`, convertedImageBuffer);
           image.small = `${process.env.URL}${small}`
           files.push(image)
