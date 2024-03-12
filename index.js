@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const uploadMiddleware = multer({ storage: storage }).array('image', 5);
+const uploadMiddleware = multer({ storage: storage }).array('image', 10);
 const outputPath = `${process.cwd()}/uploads/`
 
 const uploadFile = (req, res, next) => {
