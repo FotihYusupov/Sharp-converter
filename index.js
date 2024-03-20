@@ -3,6 +3,7 @@ const path = require("path");
 const sharp = require("sharp");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
+const archiver = require("archiver");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -41,7 +42,10 @@ const uploadFile = (req, res, next) => {
               })
               .jpeg()
               .toBuffer();
-            fs.writeFileSync(`${outputPath}${filenameJPEG}`, convertedImageBuffer);
+            fs.writeFileSync(
+              `${outputPath}${filenameJPEG}`,
+              convertedImageBuffer
+            );
             image.large = `${process.env.URL}${filenameJPEG}`;
             const mediumJPEG = `${Date.now()}_${i}.jpeg`;
             convertedImageBuffer = await sharp(req.files[i].path)
@@ -51,7 +55,10 @@ const uploadFile = (req, res, next) => {
               })
               .jpeg()
               .toBuffer();
-            fs.writeFileSync(`${outputPath}${mediumJPEG}`, convertedImageBuffer);
+            fs.writeFileSync(
+              `${outputPath}${mediumJPEG}`,
+              convertedImageBuffer
+            );
             image.medium = `${process.env.URL}${mediumJPEG}`;
             const smallJPEG = `${Date.now()}_${i}.jpeg`;
             convertedImageBuffer = await sharp(req.files[i].path)
@@ -64,7 +71,7 @@ const uploadFile = (req, res, next) => {
             fs.writeFileSync(`${outputPath}${smallJPEG}`, convertedImageBuffer);
             image.small = `${process.env.URL}${smallJPEG}`;
             files.push(image);
-            fs.unlinkSync(`${process.cwd()}/${req.files[i].path}`);
+            fs.unlinkSync(path.join(process.cwd(), req.files[i].path));
             break;
           case "png":
             const filenamePNG = `${Date.now()}_${i}.png`;
@@ -75,7 +82,10 @@ const uploadFile = (req, res, next) => {
               })
               .png()
               .toBuffer();
-            fs.writeFileSync(`${outputPath}${filenamePNG}`, convertedImageBuffer);
+            fs.writeFileSync(
+              `${outputPath}${filenamePNG}`,
+              convertedImageBuffer
+            );
             image.large = `${process.env.URL}${filenamePNG}`;
             const mediumPNG = `${Date.now()}_${i}.png`;
             convertedImageBuffer = await sharp(req.files[i].path)
@@ -98,7 +108,7 @@ const uploadFile = (req, res, next) => {
             fs.writeFileSync(`${outputPath}${smallPNG}`, convertedImageBuffer);
             image.small = `${process.env.URL}${smallPNG}`;
             files.push(image);
-            fs.unlinkSync(`${process.cwd()}/${req.files[i].path}`);
+            fs.unlinkSync(path.join(process.cwd(), req.files[i].path));
             break;
           case "webp":
             const filenameWEBP = `${Date.now()}_${i}.webp`;
@@ -109,8 +119,11 @@ const uploadFile = (req, res, next) => {
               })
               .webp()
               .toBuffer();
-            fs.writeFileSync(`${outputPath}${filenameWEBP}`, convertedImageBuffer);
-            image.large = `${process.env.URL}${filenameWEBP}`;
+            fs.writeFileSync(
+              `${outputPath}${filenameWEBP}`,
+              convertedImageBuffer
+            );
+            image.large = filenameWEBP;
             const mediumWEBP = `${Date.now()}_${i}.webp`;
             convertedImageBuffer = await sharp(req.files[i].path)
               .resize(1000, 1000, {
@@ -119,8 +132,11 @@ const uploadFile = (req, res, next) => {
               })
               .webp()
               .toBuffer();
-            fs.writeFileSync(`${outputPath}${mediumWEBP}`, convertedImageBuffer);
-            image.medium = `${process.env.URL}${mediumWEBP}`;
+            fs.writeFileSync(
+              `${outputPath}${mediumWEBP}`,
+              convertedImageBuffer
+            );
+            image.medium = mediumWEBP;
             const smallWEBP = `${Date.now()}_${i}.webp`;
             convertedImageBuffer = await sharp(req.files[i].path)
               .resize(600, 600, {
@@ -130,19 +146,56 @@ const uploadFile = (req, res, next) => {
               .webp()
               .toBuffer();
             fs.writeFileSync(`${outputPath}${smallWEBP}`, convertedImageBuffer);
-            image.small = `${process.env.URL}${smallWEBP}`;
+            image.small = smallWEBP;
             files.push(image);
-            fs.unlinkSync(`${process.cwd()}/${req.files[i].path}`);
+            fs.unlinkSync(path.join(process.cwd(), req.files[i].path));
             break;
           default:
             return res.status(400).json({ error: "Unsupported format" });
         }
       }
       req.images = files;
+      const zipFileName = `images_${Date.now()}.zip`;
+      const outputZipPath = path.join(outputPath, zipFileName);
+      const archive = archiver("zip", {
+        zlib: { level: 9 }, // Sets the compression level.
+      });
+
+      const outputZipStream = fs.createWriteStream(outputZipPath);
+
+      archive.pipe(outputZipStream);
+
+      archive.on("error", function (err) {
+        res.status(500).json({ message: "Error archiving files" });
+      });
+
+      const s = false
+
+      archive.on("end", function () {
+        console.log("Archive created successfully");
+      });
+
+      req.images.forEach((image) => {
+        const { large, medium, small } = image;
+        archive.file(path.join(outputPath, large), {
+          name: path.basename(large),
+        });
+        archive.file(path.join(outputPath, medium), {
+          name: path.basename(medium),
+        });
+        archive.file(path.join(outputPath, small), {
+          name: path.basename(small),
+        });
+      });
+
+      archive.finalize();
+      setTimeout(() => {
+        res.send(process.env.URL + zipFileName)
+      }, 1000)
     } else {
       req.images = [];
+      next();
     }
-    next();
   });
 };
 
