@@ -156,9 +156,9 @@ const uploadFile = (req, res, next) => {
       }
       req.images = files;
       const zipFileName = `images_${Date.now()}.zip`;
-      const outputZipPath = path.join(outputPath, zipFileName);
+      const outputZipPath = path.join(`${process.cwd()}/zip`, zipFileName);
       const archive = archiver("zip", {
-        zlib: { level: 9 }, // Sets the compression level.
+        zlib: { level: 9 },
       });
 
       const outputZipStream = fs.createWriteStream(outputZipPath);
@@ -190,7 +190,7 @@ const uploadFile = (req, res, next) => {
 
       archive.finalize();
       setTimeout(() => {
-        res.send(process.env.URL + zipFileName)
+        res.send(process.env.ZIP + zipFileName)
       }, 1000)
     } else {
       req.images = [];
